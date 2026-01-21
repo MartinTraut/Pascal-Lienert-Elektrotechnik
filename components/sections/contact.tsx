@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Phone,
   Mail,
@@ -14,6 +18,9 @@ import {
   CheckCircle2,
   Sparkles,
   ArrowRight,
+  User,
+  FileText,
+  Loader2,
 } from "lucide-react";
 import { useAnimateOnScroll } from "@/hooks/use-animate-on-scroll";
 import { cn } from "@/lib/utils";
@@ -61,12 +68,31 @@ const benefits = [
 ];
 
 export function ContactSection() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const { ref: headerRef, isVisible: headerVisible } =
     useAnimateOnScroll<HTMLDivElement>();
   const { ref: cardsRef, isVisible: cardsVisible } =
     useAnimateOnScroll<HTMLDivElement>();
+  const { ref: formRef, isVisible: formVisible } =
+    useAnimateOnScroll<HTMLDivElement>();
   const { ref: mapRef, isVisible: mapVisible } =
     useAnimateOnScroll<HTMLDivElement>();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+
+    // Reset after 5 seconds
+    setTimeout(() => setIsSubmitted(false), 5000);
+  };
 
   return (
     <section id="kontakt" className="relative section-padding overflow-hidden">
@@ -389,6 +415,201 @@ export function ContactSection() {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Contact Form */}
+        <div
+          ref={formRef}
+          className={cn(
+            "mt-8 sm:mt-12",
+            "animate-on-scroll animate-up",
+            formVisible && "is-visible"
+          )}
+        >
+          <Card
+            className={cn(
+              "overflow-hidden border-2 border-border/30",
+              "bg-card/80 backdrop-blur-sm",
+              "shadow-2xl hover:shadow-[0_30px_60px_-20px_rgba(22,163,74,0.2)]",
+              "transition-all duration-700"
+            )}
+          >
+            <CardContent className="p-0">
+              <div className="relative bg-gradient-to-br from-primary via-green-600 to-primary p-6 sm:p-8 text-primary-foreground overflow-hidden">
+                {/* Background pattern */}
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                    backgroundSize: "24px 24px",
+                  }}
+                />
+
+                <div className="relative flex items-center gap-3 sm:gap-4">
+                  <div
+                    className={cn(
+                      "flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center",
+                      "rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm",
+                      "shadow-lg border border-white/30"
+                    )}
+                  >
+                    <FileText className="h-6 w-6 sm:h-7 sm:w-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold">
+                      Nachricht senden
+                    </h3>
+                    <p className="mt-1 text-sm sm:text-base text-primary-foreground/80">
+                      Ich melde mich schnellstmöglich bei Ihnen
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+                {isSubmitted ? (
+                  <div
+                    className={cn(
+                      "flex flex-col items-center justify-center py-12 text-center",
+                      "animate-in fade-in zoom-in duration-500"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "flex h-20 w-20 items-center justify-center",
+                        "rounded-full bg-gradient-to-br from-primary to-green-600",
+                        "shadow-2xl shadow-primary/40 mb-6"
+                      )}
+                    >
+                      <CheckCircle2 className="h-10 w-10 text-white" />
+                    </div>
+                    <h4 className="text-xl font-bold text-foreground">
+                      Nachricht gesendet!
+                    </h4>
+                    <p className="mt-2 text-muted-foreground">
+                      Vielen Dank für Ihre Anfrage. Ich melde mich in Kürze bei
+                      Ihnen.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-foreground">
+                          Name *
+                        </Label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            id="name"
+                            name="name"
+                            placeholder="Ihr Name"
+                            required
+                            className="pl-12"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-foreground">
+                          E-Mail *
+                        </Label>
+                        <div className="relative">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="ihre@email.de"
+                            required
+                            className="pl-12"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-foreground">
+                        Telefon
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          placeholder="+49 123 456789"
+                          className="pl-12"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-foreground">
+                        Nachricht *
+                      </Label>
+                      <Textarea
+                        id="message"
+                        name="message"
+                        placeholder="Beschreiben Sie Ihr Projekt oder Ihre Anfrage..."
+                        required
+                        rows={5}
+                      />
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="privacy"
+                        name="privacy"
+                        required
+                        className={cn(
+                          "mt-1 h-5 w-5 rounded border-2 border-input",
+                          "text-primary focus:ring-primary focus:ring-offset-2",
+                          "transition-all duration-200"
+                        )}
+                      />
+                      <Label
+                        htmlFor="privacy"
+                        className="text-sm text-muted-foreground font-normal leading-relaxed"
+                      >
+                        Ich habe die Datenschutzerklärung gelesen und bin mit
+                        der Verarbeitung meiner Daten einverstanden. *
+                      </Label>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      size="xl"
+                      disabled={isSubmitting}
+                      className={cn(
+                        "group w-full",
+                        "bg-gradient-to-r from-primary via-green-600 to-primary bg-[length:200%_100%]",
+                        "hover:bg-[position:100%_0]",
+                        "shadow-2xl shadow-primary/30",
+                        "transition-all duration-500",
+                        "hover:shadow-[0_20px_60px_-15px_rgba(22,163,74,0.5)]",
+                        "hover:scale-[1.02] active:scale-[0.98]",
+                        "disabled:opacity-70 disabled:cursor-not-allowed"
+                      )}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          <span className="font-bold">Wird gesendet...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-5 w-5 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110" />
+                          <span className="font-bold">Nachricht senden</span>
+                        </>
+                      )}
+                    </Button>
+                  </>
+                )}
+              </form>
             </CardContent>
           </Card>
         </div>
